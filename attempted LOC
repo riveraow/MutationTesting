@@ -1,0 +1,53 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class LOCexample2 {
+
+    public static void main(String[] args) {                                                 //insert your filepath here//
+        String filePath = "C:\\Users\\User\\Desktop\\Practice Mutations\\MUTATION PRACTICE\\demo\\src\\test\\java\\com\\example\\TestStockService.java";  // READING THE FILE ///////////////////////////////////////////////////////////////////////////
+        List<String> lines = readFile(filePath);
+        List<String> functionLines = getFunctionLines(lines);
+        for (String line : functionLines) {
+            System.out.println(line);
+        }
+    }
+
+    private static List<String> readFile(String filePath) {
+        List<String> lines = new ArrayList<>();
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                lines.add(line);
+            }
+            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return lines;
+    }
+
+    private static List<String> getFunctionLines(List<String> lines) {
+        List<String> functionLines = new ArrayList<>();
+        String patternString = "\\s*\\b(public|private|protected)?\\s*\\b(static)?\\s*\\b(void|\\w+)\\s+(\\w+)\\s*\\(.*\\)\\s*\\{";
+        Pattern pattern = Pattern.compile(patternString);
+        boolean isFunctionBlock = false;
+        for (String line : lines) {
+            if (isFunctionBlock) {
+                functionLines.add(line);
+            }
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.matches()) {
+                isFunctionBlock = true;
+            }
+            if (line.contains("}") && isFunctionBlock) {
+                isFunctionBlock = false;
+            }
+        }
+        return functionLines;
+    }
+}
